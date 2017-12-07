@@ -20,7 +20,7 @@ export class AppComponent {
     this.itemDoc = this.afs.doc("users/1");
     this.col = this.afs.collection("users");
     this.col.valueChanges().subscribe(res => {
-      console.log(res);
+      // console.log(res);
       this.users = res;
     });
     this.ob = this.col.valueChanges();
