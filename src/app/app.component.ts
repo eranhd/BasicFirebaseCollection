@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from 'angularfire2/firestore';
 import { Observable } from 'rxjs/Observable';
+import { Item } from "./model/item.model"
+import { FirestoreService } from './firestore.service';
+import { MatTableDataSource, MatSort } from '@angular/material';
 
 @Component({
   selector: 'app-root',
@@ -8,31 +11,31 @@ import { Observable } from 'rxjs/Observable';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  public name: string;
-  public lname: string;
-  private itemDoc: AngularFirestoreDocument<any>;
-  private col: AngularFirestoreCollection<any>;
-  public users;
 
-  public ob;
-
-  constructor(private afs: AngularFirestore) {
-    this.itemDoc = this.afs.doc("users/1");
-    this.col = this.afs.collection("users");
-    this.col.valueChanges().subscribe(res => {
-      // console.log(res);
-      this.users = res;
-    });
-    this.ob = this.col.valueChanges();
-    // this.name = item.name;
-    // this.lname = item.lname;
+  displayedColumns = ['name', 'cost', 'discount', 'date'];
+  dataSource 
+  @ViewChild(MatSort) sort: MatSort;
+  public itemToSave: Item = new Item();
 
 
+  constructor(public fss: FirestoreService) {
+
+    
   }
-  send() {
 
-    this.col.add({ name: this.name, lname: this.lname }).then(res => {
-      // alert(res);
-    })
+
+  save() {
+    this.itemToSave.date = new Date()
+    this.fss.save(
+      {
+        name: this.itemToSave.name,
+        cost: this.itemToSave.cost,
+        date: this.itemToSave.date,
+        discount: this.itemToSave.discount
+      }
+    )
+    this.dataSource = new MatTableDataSource(this.fss.allItems);
+    this.itemToSave = new Item()
+
   }
 }
